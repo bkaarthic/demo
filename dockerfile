@@ -1,2 +1,2 @@
-image ubuntu
-user kaarthic
+image redhat
+user john
