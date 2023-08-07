@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        Name= "capgemini"
+        Name= "cytiva"
     }
     
     stages {
