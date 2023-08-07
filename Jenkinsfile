@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage ('env') {
             steps {
-                sh 'echo "$Name"'
+                git branch: 'main', credentialsId: 'git-creds', url: 'https://github.com/bkaarthic/demo.git'
             }
         }
     }
