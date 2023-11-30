@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage ('env') {
             steps {
-                echo "$Name"
+                echo "$Name" & "Date"
             }
         }
     }
