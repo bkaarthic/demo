@@ -63,6 +63,31 @@ $script:DefaultAppGroup = "cloud-app01"
 $script:SiteFolder = "\\cloud-storage.$DomainName\share\sites"
 $script:AppPool = "IIS:\AppPools"
 
+# Set the value of $User to the desired user name
+$User = (Get-SSMParameter -Name "SupportAdminUser" -WithDecryption $True).Value
+Write-Host "User: $User"
+
+
+# Retrieve the SupportAdminPassword from SSM Parameter Store
+$Password = (Get-SSMParameter -Name "SupportAdminPassword" -WithDecryption $True).Value
+
+# Check if the password is found
+if ($Password) {
+    Write-Host "Password found."
+}
+else {
+     Write-Host "Password not found."
+}
+
+# Convert the password to a secure string
+$SecureStringPassword = ConvertTo-SecureString $Password -AsPlainText -Force
+
+# Create a PSCredential object using the provided username and password
+$credObject = New-Object System.Management.Automation.PSCredential ($User, $SecureStringPassword)
+
+# Create a PSDrive using the RemoteDrive provider, with the specified site folder as the root, and using the credential object
+New-PSDrive -Name "RemoteDrive" -PSProvider FileSystem -Root "$SiteFolder" -Credential $credObject | Out-Null
+
 # Function to write verbose messages if the verbose mode is enabled
 function Write-Verbose ($message) {
     if ($script:Verbose) {
@@ -89,8 +114,8 @@ $AppPools = @()
 #     4. All
 switch ($AppPoolChoice) {
     '1' {
-        if (Test-Path "$SiteFolder\$Site\WebSite\WebAppSettings.config") {
-            $xml = [xml](get-content "$SiteFolder\$Site\WebSite\WebAppSettings.config")
+        if (Test-Path "RemoteDrive:\$Site\WebSite\WebAppSettings.config") {
+            $xml = [xml](get-content "RemoteDrive:\$Site\WebSite\WebAppSettings.config")
             if ($xml.SelectSingleNode("//appSettings/add[@key = 'AppGroup']")) {
                 $script:AppGroup = $xml.SelectSingleNode("//appSettings/add[@key = 'AppGroup']").value
                 Write-Verbose ("AppGroup: $AppGroup")
@@ -118,12 +143,12 @@ switch ($AppPoolChoice) {
         }
     }
     '2' {
-        if (Test-Path "$SiteFolder\$Site\Site") {
+        if (Test-Path "RemoteDrive:\$Site\Site") {
             $AppPools += "Cityworks_${Site}_AppPool"
             Write-Verbose ("AppPools: $AppPools")
 
             Import-Module powershell-yaml
-            $yamlContent = Get-Content "$SiteFolder\$Site\Site\cw-site\run.yaml" | ConvertFrom-Yaml
+            $yamlContent = Get-Content "RemoteDrive:\$Site\Site\cw-site\run.yaml" | ConvertFrom-Yaml
             $uri = New-Object System.Uri($yamlContent.HostUrl)
             Write-Verbose ("HostUrl: $uri")
             $script:appHost = $uri.Host      
@@ -135,11 +160,11 @@ switch ($AppPoolChoice) {
         }
     }
     '3' {
-        if (Test-Path "$SiteFolder\$Site\PublicAccess") {
+        if (Test-Path "RemoteDrive:\$Site\PublicAccess") {
             $AppPools += "$Site-PublicAppPool"
             Write-Verbose ("AppPools: $AppPools")
 
-            $xml = [xml](get-content "$SiteFolder\$Site\PublicSite\WebAppSettings.config")    
+            $xml = [xml](get-content "RemoteDrive:\$Site\PublicSite\WebAppSettings.config")    
             $uri = New-Object System.Uri($xml.SelectSingleNode("//appSettings/add[@key = 'ServiceUrl']").value)
             Write-Verbose ("HostUrl: $uri")
             $script:appHost = $uri.Host     
@@ -151,7 +176,7 @@ switch ($AppPoolChoice) {
         }
     }
     '4' {
-        $xml = [xml](get-content "$SiteFolder\$Site\WebSite\WebAppSettings.config")
+        $xml = [xml](get-content "RemoteDrive:\$Site\WebSite\WebAppSettings.config")
         if ($xml.SelectSingleNode("//appSettings/add[@key = 'AppGroup']")) {
             $script:AppGroup = $xml.SelectSingleNode("//appSettings/add[@key = 'AppGroup']").value
             Write-Verbose ("AppGroup: $AppGroup")
@@ -172,12 +197,12 @@ switch ($AppPoolChoice) {
             Write-Verbose ("AppPools: $AppPools")
         }
 
-        if (Test-Path "$SiteFolder\$Site\Site") {
+        if (Test-Path "RemoteDrive:\$Site\Site") {
             $AppPools += "Cityworks_${Site}_AppPool"
             Write-Verbose ("AppPools: $AppPools")
         }
 
-        if (Test-Path "$SiteFolder\$Site\PublicAccess") {
+        if (Test-Path "RemoteDrive:\$Site\PublicAccess") {
             $AppPools += "$Site-PublicAppPool"
             Write-Verbose ("AppPools: $AppPools")
         }
@@ -185,10 +210,15 @@ switch ($AppPoolChoice) {
     default { Write-Host "`t Not a valid option. Try again." -f red }
 }
 
+# Perform operations using the RemoteDrive
+# Remove the RemoteDrive
+Remove-PSDrive -Name "RemoteDrive"
+
 $appServer = $(Resolve-DnsName $appHost).IP4Address | Resolve-DnsName | Select-Object -ExpandProperty NameHost
 Write-Verbose ("AppServer: $appServer")
 
-$s = New-PSSession -ComputerName $appServer
+# Create a new PSSession to the specified appServer using the provided credential object
+$s = New-PSSession -ComputerName $appServer -Credential $credObject
 
 Invoke-Command -Session $s -Script {
     foreach ($AppPool in $using:AppPools) {
