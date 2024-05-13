@@ -1,0 +1,18 @@
+{{- range .Values.persistentVolumes }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .name }}
+spec:
+  capacity:
+    storage: {{ $.Values.storage }}
+  volumeMode: Filesystem
+  accessModes: 
+    {{- toYaml $.Values.accessModes | nindent 4 }}
+  storageClassName: {{ $.Values.storageClassName }}
+  persistentVolumeReclaimPolicy: {{ $.Values.persistentVolumeReclaimPolicy }}
+  csi:
+    driver: {{ $.Values.csiDriver }}
+    volumeHandle: {{ .volumeHandle }}
+---
+{{- end }}

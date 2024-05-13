@@ -1,0 +1,9 @@
+{{- if .Values.efsStorageClass.create -}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+{{- with .Values.efsStorageClass }}
+metadata:
+  name: {{ .name }}
+provisioner: {{ .provisioner }}
+{{- end }}
+{{- end }}

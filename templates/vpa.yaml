@@ -1,0 +1,17 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ include "sre-cw-host.fullname" . }}-vpa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "sre-cw-host.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "sre-cw-host.fullname" . }}
+  updatePolicy:
+    updateMode: "Off"
+  
+{{- end }}
