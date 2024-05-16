@@ -1,0 +1,25 @@
+# .github/workflows/deploy.yml
+
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main # Or specify your desired branch
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run Deployment Script
+        uses: actions/setup-powershell@v1
+        with:
+          pwsh-version: '7.1'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          .\deploy.ps1
