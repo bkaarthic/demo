@@ -1,18 +1,18 @@
-name: Deploy to EC2
+name: Run PowerShell Script
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust the branch as needed
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  run-script:
+    runs-on: windows-latest  # You can specify 'runs-on: self-hosted' if using a self-hosted runner
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Clone repo
-      run: |
-        "C:\Program Files\git\bin\git" clone https://github.com/yourusername/yourrepository.git C:\Test
+      - name: Run PowerShell Script
+        shell: pwsh
+        run: C:\Test\hello.ps1
