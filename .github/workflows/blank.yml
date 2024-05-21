@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-script:
-    runs-on: windows-latest  # You can specify 'runs-on: self-hosted' if using a self-hosted runner
+    runs-on: windows-latest  # Yu can specify 'runs-on: self-hosted' if using a self-hosted runner
 
     steps:
       - name: Checkout Repository
