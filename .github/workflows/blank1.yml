@@ -15,5 +15,5 @@ jobs:
 
     - name: Clone repo
       run: |
-        mkdir "C:\Test2"
+        Get-Location
   
