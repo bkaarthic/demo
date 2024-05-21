@@ -1,18 +1,17 @@
-name: Auto Clone Repository on Windows EC2 Instance
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - main  # Adjust the branch as needed
+      - main
 
 jobs:
-  clone-repo:
-    runs-on: self-hosted  # This ensures the job runs on your self-hosted runner
+  deploy:
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Clone Repository to Windows EC2 Instance
-        run: |
-          ssh administrator@172.31.18.8 "git -C C:\Testwin pull"
+    - name: Clone repo
+      run: git clone https://github.com/bkaarthic/demo.git
