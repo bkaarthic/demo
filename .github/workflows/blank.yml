@@ -15,4 +15,4 @@ jobs:
 
       - name: Clone Repository to Windows EC2
         run: |
-          git clone https://github.com/yourusername/yourrepository.git C:\Test
+          C:\Program Files\git\bin\git clone https://github.com/yourusername/yourrepository.git C:\Test
