@@ -12,5 +12,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      with:
-        path: 'C:\Test'
+
+    - name: Copy code to target directory
+      run: |
+        mkdir "C:\Test3"
+        xcopy /E /I . "C:\Test3"
