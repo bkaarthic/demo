@@ -15,4 +15,4 @@ jobs:
 
     - name: Clone repo
       run: |
-        mkdir "C:\Test1"
+        "C:\Program Files\git\bin\git" clone https://github.com/yourusername/yourrepository.git C:\Test
