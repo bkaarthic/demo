@@ -1,17 +1,18 @@
-name: Deploy to EC2
+name: Clone Repository on Windows EC2
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust the branch as needed
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  clone-repo:
+    runs-on: self-hosted  # This ensures the job runs on your self-hosted runner
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Clone repo
-      run: git --version
+      - name: Clone Repository to Windows EC2
+        run: |
+          git clone https://github.com/yourusername/yourrepository.git C:\Test
