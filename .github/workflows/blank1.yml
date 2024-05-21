@@ -1,18 +1,19 @@
-name: Run PowerShell Script
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - main  # Adjust the branch as needed
+      - main
 
 jobs:
-  run-script:
-    runs-on: self-hosted  # Yu can specify 'runs-on: self-hosted' if using a self-hosted runner
+  deploy:
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Run PowerShell Script
-        shell: pwsh
-        run: Get-Location
+    - name: Clone repo
+      run: |
+        mkdir "C:\Test2"
+  
