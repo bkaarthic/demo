@@ -15,5 +15,6 @@ jobs:
 
     - name: Copy code to target directory
       run: |
-        mkdir "C:\Test3"
-        xcopy /E /I . "C:\Test3"
+        mkdir "C:\Test4"
+        echo|.github> exclude.txt
+        xcopy /E /I /EXCLUDE:exclude.txt . "C:\Test4"
