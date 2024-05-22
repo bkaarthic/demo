@@ -1,18 +1,14 @@
-name: Run PowerShell Script
+name: Checkout Code on Linux
 
 on:
   push:
     branches:
-      - main  # Adjust the branch as needed
+      - main
 
 jobs:
-  run-script:
-    runs-on: windows-latest  # Yu can specify 'runs-on: self-hosted' if using a self-hosted runner
+  checkout_code:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Run PowerShell Script
-        shell: pwsh
-        run: Get-Location
+    - name: Checkout code
+      uses: actions/checkout@v2
